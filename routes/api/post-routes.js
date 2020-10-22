@@ -78,29 +78,8 @@ router.post('/', (req, res) => {
 
 // update a post's vote count
 router.put('/upvote', (req,res) => {
-    // create the vote
-    Vote.create({
-        user_id: req.body.user_id,
-        post_id: req.body.post_id
-    })
-    // then find the post that was just upvoted
-    .then(() => {
-        return Post.findOne({
-            where: {
-                id: req.body.post_id
-            },
-            attributes: [
-                'id',
-                'post_url',
-                'title',
-                'created_at',
-                [
-                    sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'),
-                    'vote_count'
-                ]
-            ]
-        });
-    })
+    // custom static method created in models/Post.js
+    Post.upvote(req.body, { Vote })
     .then(dbPostData => res.json(dbPostData))
     .catch(err => {
         console.log(err);
