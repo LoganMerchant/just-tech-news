@@ -1,12 +1,40 @@
+// dependencies
+const path = require('path');
 const express = require('express');
-const routes = require('./routes');
+const exphbs = require('express-handlebars');
+const session = require('express-session');
+
+// imports
+const helpers = require('./utils/helpers');
+const routes = require('./controllers');
 const sequelize = require('./config/connection');
 
+// session setup
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const sess = {
+    secret: process.env.cookie,
+    cookie: {},
+    resave: false,
+    saveUninitialized: true,
+    store: new SequelizeStore({
+        db: sequelize
+    })
+};
+
+// server setup
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// handlebars.js setup
+const hbs = exphbs.create({ helpers });
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
+// express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(session(sess));
 
 // turn on routes
 app.use(routes);
