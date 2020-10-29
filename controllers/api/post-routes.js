@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const sequelize = require('../../config/connection');
+const withAuth = require('../../utils/auth');
 const { Post, User, Vote, Comment } = require('../../models');
 
 // get all posts
@@ -78,7 +79,7 @@ router.get('/:id', (req, res) => {
 });
 
 // create a post
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
     Post.create({
         title: req.body.title,
         post_url: req.body.post_url,
@@ -92,7 +93,7 @@ router.post('/', (req, res) => {
 });
 
 // update a post's vote count
-router.put('/upvote', (req,res) => {
+router.put('/upvote', withAuth, (req,res) => {
     // make sure the session exists
     if (req.session) {
         // pass session id along with destructured properties on req.body...
@@ -107,7 +108,7 @@ router.put('/upvote', (req,res) => {
 });
 
 // update a post's title
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
     Post.update({
         title: req.body.title
     },
@@ -133,7 +134,7 @@ router.put('/:id', (req, res) => {
 });
 
 // delete a post
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
     Post.destroy({
         where: {
             id: req.params.id
