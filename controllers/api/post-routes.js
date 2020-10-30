@@ -135,6 +135,26 @@ router.put('/:id', withAuth, (req, res) => {
 
 // delete a post
 router.delete('/:id', withAuth, (req, res) => {
+    Comment.destroy({
+        where: {
+            post_id: req.params.id
+        }
+    })
+    .then(dbPostData => {
+        if (!dbPostData) {
+            res.status(404).json({ message: 'No post found with this id.' });
+            return;
+        };
+
+        res.json(dbPostData);
+    })
+    .catch(err => {
+        if (err) {
+            console.log(err);
+            res.status(500).json(err);
+        };
+    });
+    
     Post.destroy({
         where: {
             id: req.params.id
